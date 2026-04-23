@@ -6,6 +6,20 @@ project establishes the foundation for all subsequent platform components
 (observability, service mesh, autoscaling) which will be deployed via the
 same GitOps workflow.
 
+## Screenshots
+
+### ArgoCD Application List
+![ArgoCD Applications](docs/screenshots/01-argocd-applications-list.png)
+
+### ArgoCD Tree View — Full GitOps Sync
+![ArgoCD Tree View](docs/screenshots/02-argocd-tree-view.png)
+
+Notice the two ReplicaSets visible — `rev:2` (current, nginx) and `rev:1` (previous, heptio demo image). This shows the real-world debugging loop: the initial image was no longer available, so the fix was committed to Git, and ArgoCD rolled out the updated version.
+
+### Cluster State Verification
+![kubectl get all](docs/screenshots/03-kubectl-get-all.png)
+
+
 ## Architecture
 
 ```
@@ -69,6 +83,21 @@ GitHub: yurykuvaev/eks-platform-engineering          GitHub: yurykuvaev/k8s-gito
 ## Cost
 
 Running cost: **~$0.20/hour** (EKS control plane $0.10/h + 2× t3.medium + LoadBalancer). Destroyed at end of each session via `terraform destroy`.
+
+## Lessons Learned
+
+### EKS nodes in public subnets require `map_public_ip_on_launch = true`
+Without NAT Gateway (skipped for lab cost optimization), worker nodes must have public IPs to reach the EKS API endpoint and pull container images. The `terraform-aws-modules/vpc` module does not set this by default.
+
+**Production alternative:** Private subnets with NAT Gateway (~$35/month) or VPC endpoints for AWS services (EKS, ECR, STS, S3) — more secure but adds cost and complexity.
+
+### Container image availability is not guaranteed
+Initially used `gcr.io/heptio-images/ks-guestbook-demo:0.2` which is no longer publicly pullable (403 Forbidden). Diagnosed via `kubectl describe pod` showing `ImagePullBackOff`.
+
+**Production mitigation:** Mirror public images to a private registry (ECR), pin by SHA digest not tag, and alert on `kube_pod_container_status_waiting_reason{reason="ImagePullBackOff"}`.
+
+### Two-repo GitOps structure
+Infrastructure manifests (this repo) and application manifests (`k8s-gitops-apps`) are intentionally separated. This mirrors how platform and application teams own different concerns in production.
 
 ## Key Terraform Decisions
 
