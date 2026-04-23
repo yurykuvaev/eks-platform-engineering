@@ -1,0 +1,23 @@
+@"
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+*.tfvars
+!*.tfvars.example
+tfplan
+.terraform.lock.hcl
+.terraform/
+tfplan
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Kubernetes
+kubeconfig
+"@ | Out-File -FilePath .gitignore -Encoding utf8
