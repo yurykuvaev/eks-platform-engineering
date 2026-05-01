@@ -1,23 +1,18 @@
 # EKS Platform Engineering
 
-> Personal lab building a production-pattern Kubernetes platform on AWS — one capability at a time.
+> A reproducible EKS + ArgoCD lab — Terraform-provisioned cluster, GitOps delivery, real screenshots from a debugging session.
 
-This repository is a hands-on portfolio of platform engineering work on **Amazon EKS**: Terraform-provisioned infrastructure, GitOps delivery with ArgoCD, and progressive additions of observability, service mesh, autoscaling, and secrets management. Each numbered folder is a self-contained project with its own Terraform, manifests, and write-up.
+A hands-on portfolio piece on **Amazon EKS**: Terraform-provisioned infrastructure and GitOps delivery with ArgoCD, with the workloads it reconciles living in a separate repo.
 
 **Companion repo:** [`k8s-gitops-apps`](https://github.com/yurykuvaev/k8s-gitops-apps) — application manifests continuously reconciled by ArgoCD.
 
+**Larger sibling project:** [`terrascale-platform`](https://github.com/yurykuvaev/terrascale-platform) — multi-environment EKS platform with Terragrunt, observability, secrets, autoscaling, and ADRs.
+
 ---
 
-## Portfolio Roadmap
+## What's in here
 
-| # | Project | Focus | Status |
-|---|---|---|---|
-| 01 | [EKS + ArgoCD](./01-eks-argocd) | EKS cluster, GitOps foundation | **Complete** |
-| 02 | Observability stack | Prometheus, Grafana, Loki via Helm + ArgoCD | Planned |
-| 03 | Service mesh | Istio ambient mode, mTLS, traffic policies | Planned |
-| 04 | Secrets & IRSA | External Secrets Operator + AWS Secrets Manager | Planned |
-| 05 | Autoscaling | Karpenter node autoscaling, HPA, KEDA | Planned |
-| 06 | From-scratch EKS module | Custom Terraform module (no community modules) | Planned |
+[**Project 01 — EKS + ArgoCD**](./01-eks-argocd/README.md): a Terraform-provisioned EKS cluster bootstrapped with ArgoCD, the `guestbook` application reconciled from Git, and a documented rollback session.
 
 ---
 
@@ -25,12 +20,11 @@ This repository is a hands-on portfolio of platform engineering work on **Amazon
 
 **Cloud & infra** — AWS (EKS, VPC, IAM, KMS), Terraform 1.9+, `terraform-aws-modules`
 **Kubernetes** — EKS 1.30, Helm, ArgoCD, Kustomize
-**Planned** — Prometheus, Grafana, Loki, Istio, Karpenter, External Secrets Operator, KEDA
 **Patterns** — GitOps, IaC, IRSA, least-privilege IAM, self-healing sync, drift detection
 
 ---
 
-## Architecture (current state)
+## Architecture
 
 ```
 GitHub: yurykuvaev/eks-platform-engineering       GitHub: yurykuvaev/k8s-gitops-apps
@@ -52,7 +46,7 @@ v                                                   |
 
 ---
 
-## Preview — Project 01
+## Preview
 
 ![ArgoCD Tree View](./01-eks-argocd/docs/screenshots/02-argocd-tree-view.png)
 
@@ -62,17 +56,17 @@ ArgoCD reconciling the `guestbook` application from Git, with a visible rollback
 
 ## What This Demonstrates
 
-- **Infrastructure as Code** — entire platform reproducible from `terraform apply`; teardown via `terraform destroy`
+- **Infrastructure as Code** — cluster reproducible from `terraform apply`; teardown via `terraform destroy`
 - **GitOps delivery** — no manual `kubectl apply` in normal operation; Git is the source of truth
 - **Separation of concerns** — platform repo (this) vs. application repo ([`k8s-gitops-apps`](https://github.com/yurykuvaev/k8s-gitops-apps))
 - **Self-healing & drift detection** — manual changes in-cluster are reverted to the Git-declared state
-- **Cost-aware lab design** — ~$0.20/hour, torn down between sessions; lessons learned documented alongside each project
+- **Cost-aware lab design** — ~$0.20/hour, torn down between sessions; lessons learned documented alongside the project
 
 ---
 
 ## Running It
 
-Each project is self-contained with its own README and `terraform apply` / `terraform destroy` flow. Start with [**Project 01 — EKS + ArgoCD**](./01-eks-argocd/README.md).
+The project is self-contained with its own README and `terraform apply` / `terraform destroy` flow. See [**Project 01 — EKS + ArgoCD**](./01-eks-argocd/README.md).
 
 Prerequisites: AWS account, `aws` CLI, `terraform` ≥ 1.9, `kubectl`, `helm`.
 
